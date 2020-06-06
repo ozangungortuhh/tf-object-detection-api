@@ -14,6 +14,7 @@ services:
             - /dev/video0:/dev/video0
         volumes: 
             - /tmp/.X11-unix:/tmp/.X11-unix:rw
+            - ../sample_models/:/tensorflow/models/research/object_detection/sample_models/
             - ../apps/display_detections_cam.py:/tensorflow/models/research/object_detection/display_detections_cam.py
         ports:
             - 50055:50051
