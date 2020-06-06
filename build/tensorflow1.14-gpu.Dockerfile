@@ -2,7 +2,7 @@ FROM tensorflow/tensorflow:1.14.0-gpu-py3
 ARG DEBIAN_FRONTEND=noninteractive
 
 # dependencies
-RUN apt-get -y update && apt-get -y install \
+RUN apt-get -y update && apt-get -y install &&  apt-get install -y apt-utils \
     build-essential \
     wget \
     tmux \
@@ -32,8 +32,12 @@ RUN pip install Cython \
     jupyter \
     pathlib
 
+RUN apt-get install protobuf-compiler -y
 WORKDIR /tensorflow
 RUN git clone https://github.com/ozangungortuhh/models.git
+
+WORKDIR /tensorflow/models/research
+RUN protoc object_detection/protos/*.proto --python_out=.
 
 WORKDIR /tensorflow/models/research
 RUN pip install .
