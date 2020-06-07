@@ -6,6 +6,7 @@ services:
             context: ../
             dockerfile: ./build/tensorflow1.14-gpu.Dockerfile
         container_name: tensorflow
+        working_dir: /tensorflow/models/object_detection
         environment:
             - "QT_X11_NO_MITSHM=1"
             - "DISPLAY"
@@ -21,6 +22,7 @@ services:
             - ../apps/tensorflow_service.py:/tensorflow/models/research/object_detection/tensorflow_service.py
             - ../apps/tensorflow_client.py:/tensorflow/models/research/object_detection/tensorflow_client.py
             - ../apps/detection_service.py:/tensorflow/models/research/object_detection/detection_service.py
+            - ../apps/test_service.py:/tensorflow/models/research/object_detection/test_service.py
         ports:
             - 50055:50051
         runtime: nvidia
