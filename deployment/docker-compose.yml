@@ -20,6 +20,7 @@ services:
             - ../apps/display_detections_cam.py:/tensorflow/models/research/object_detection/display_detections_cam.py
             - ../apps/tensorflow_service.py:/tensorflow/models/research/object_detection/tensorflow_service.py
             - ../apps/tensorflow_client.py:/tensorflow/models/research/object_detection/tensorflow_client.py
+            - ../apps/detection_service.py:/tensorflow/models/research/object_detection/detection_service.py
         ports:
             - 50055:50051
         runtime: nvidia
