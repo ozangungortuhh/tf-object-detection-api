@@ -23,6 +23,7 @@ services:
             - ../apps/tensorflow_client.py:/tensorflow/models/research/object_detection/tensorflow_client.py
             - ../apps/detection_service.py:/tensorflow/models/research/object_detection/detection_service.py
             - ../apps/tf_test_service.py:/tensorflow/models/research/object_detection/tf_test_service.py
+            - ../apps/tf_detection_service.py:/tensorflow/models/research/object_detection/tf_detection_service.py
         ports:
             - 50055:50051
         runtime: nvidia
