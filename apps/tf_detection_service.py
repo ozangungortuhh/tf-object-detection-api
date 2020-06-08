@@ -56,6 +56,7 @@ class ObjectDetectionServicer(object_detection_pb2_grpc.ObjectDetectionServicer)
         # Receive img from gRPC client
         np_img = np.fromstring(request.data, np.uint8)
         cv_img = cv2.imdecode(np_img, cv2.COLOR_BGR2RGB)
+        height, width, channel = cv_img.shape
         print("Received the image with shape: ", cv_img.shape)
         objects = []
         
@@ -73,12 +74,31 @@ class ObjectDetectionServicer(object_detection_pb2_grpc.ObjectDetectionServicer)
         num_detections = detection_graph.get_tensor_by_name(
             'num_detections:0')
         # Actual detection.
-        (boxes, scores, classes, num_detections) = sess.run(
+        (boxes, scores, classes, nums) = sess.run(
             [boxes, scores, classes, num_detections],
-            feed_dict={image_tensor: image_np_expanded})    
+            feed_dict={image_tensor: image_np_expanded})  
         
-        print("Returning detections")
-        return object_detection_pb2.Detection(objects=objects)
+        batch_idx = 0
+
+        for i in range(int(nums[batch_idx])):
+            class_id = classes[batch_idx][i]
+            label= category_index[class_id]['name']
+            probability=np.array(scores[batch_idx][i])
+            ymin=int(np.array(boxes[batch_idx][i][0])*height)
+            xmin=int(np.array(boxes[batch_idx][i][1])*width)
+            ymax=int(np.array(boxes[batch_idx][i][2])*height)
+            xmax=int(np.array(boxes[batch_idx][i][3])*width)
+            
+            new_obj = object_detection_pb2.Object(
+                label=label,
+                probability=probability,
+                xmin=xmin,
+                ymin=ymin,
+                xmax=xmax,
+                ymax=ymax,
+            )            
+            objects.append(new_obj)
+        return object_detection_pb2.Detection(objects=objects)  
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
