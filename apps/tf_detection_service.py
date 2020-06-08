@@ -46,6 +46,8 @@ categories = label_map_util.convert_label_map_to_categories(
     label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
+sess = tf.Session( graph = detection_graph )
+
 class ObjectDetectionServicer(object_detection_pb2_grpc.ObjectDetectionServicer):
     def __init__(self):
         print("Initializied detection service for tensorflow")
@@ -57,26 +59,23 @@ class ObjectDetectionServicer(object_detection_pb2_grpc.ObjectDetectionServicer)
         print("Received the image with shape: ", cv_img.shape)
         objects = []
         
-        with detection_graph.as_default():
-            with tf.compat.v1.Session(graph=detection_graph) as sess:
-
-                # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-                image_np_expanded = np.expand_dims(cv_img, axis=0)
-                # Extract image tensor
-                image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
-                # Extract detection boxes
-                boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
-                # Extract detection scores
-                scores = detection_graph.get_tensor_by_name('detection_scores:0')
-                # Extract detection classes
-                classes = detection_graph.get_tensor_by_name('detection_classes:0')
-                # Extract number of detectionsd
-                num_detections = detection_graph.get_tensor_by_name(
-                    'num_detections:0')
-                # Actual detection.
-                (boxes, scores, classes, num_detections) = sess.run(
-                    [boxes, scores, classes, num_detections],
-                    feed_dict={image_tensor: image_np_expanded})    
+        # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+        image_np_expanded = np.expand_dims(cv_img, axis=0)
+        # Extract image tensor
+        image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+        # Extract detection boxes
+        boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+        # Extract detection scores
+        scores = detection_graph.get_tensor_by_name('detection_scores:0')
+        # Extract detection classes
+        classes = detection_graph.get_tensor_by_name('detection_classes:0')
+        # Extract number of detectionsd
+        num_detections = detection_graph.get_tensor_by_name(
+            'num_detections:0')
+        # Actual detection.
+        (boxes, scores, classes, num_detections) = sess.run(
+            [boxes, scores, classes, num_detections],
+            feed_dict={image_tensor: image_np_expanded})    
         
         print("Returning detections")
         return object_detection_pb2.Detection(objects=objects)
