@@ -10,6 +10,7 @@ __pycache__/
 .Python
 .vscode/
 #build/
+sample_models/
 weights/
 develop-eggs/
 dist/
