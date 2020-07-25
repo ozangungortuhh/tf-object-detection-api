@@ -6,6 +6,7 @@ import tarfile
 import tensorflow as tf
 import zipfile
 import cv2
+import time
 
 from collections import defaultdict
 from io import StringIO
@@ -74,6 +75,9 @@ def load_image_into_numpy_array(image):
 # Detection
 with detection_graph.as_default():
     with tf.compat.v1.Session(graph=detection_graph) as sess:
+        start = time.time()
+        tick = 0
+        frame_counter = 0
         while True:
             # Read frame from camera
             ret, image_np = cap.read()
@@ -106,6 +110,14 @@ with detection_graph.as_default():
 
             # Display output
             cv2.imshow('object detection', cv2.resize(image_np, (800, 600)))
-
+            
+            # Print FPS
+            frame_counter += 1
+            time_now = time.time() - start
+            if(time_now - tick >= 1):
+                tick += 1
+                print("FPS:", frame_counter)
+                frame_counter = 0
+            
             if cv2.waitKey(25) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
